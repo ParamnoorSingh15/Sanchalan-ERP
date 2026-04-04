@@ -76,7 +76,7 @@ export default function LoginPage() {
                             />
                         </div>
 
-                        {error && <div className="rounded-md bg-red-900/50 p-3 text-sm text-red-400">{error}</div>}
+                        {error && <div className="rounded-md bg-red-600 p-3 text-sm font-medium text-white">{error}</div>}
 
                         <button
                             type="submit"
