@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const config = require('./config/env');
+const { dbMiddleware } = require('./config/database');
 
 const app = express();
 
@@ -16,6 +17,9 @@ app.use(cors({
 // ─── Body parsing ───────────────────────────────────────────────────────────
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// ─── Ensure DB is connected before all routes ───────────────────────────────
+app.use(dbMiddleware);
 
 // ─── Module routes ─────────────────────────────────────────────────────────
 app.use('/api/auth', require('./modules/auth/auth.routes'));

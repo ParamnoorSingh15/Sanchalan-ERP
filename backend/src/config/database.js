@@ -14,7 +14,6 @@ const connect = async () => {
         const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/sanchalan';
         cached.promise = mongoose.connect(MONGO_URL, {
             serverSelectionTimeoutMS: 10000,
-            bufferCommands: false,
         }).then((m) => {
             console.log('[DB] Connected to MongoDB');
             return m;
@@ -24,4 +23,15 @@ const connect = async () => {
     return cached.conn;
 };
 
-module.exports = { connect };
+// Middleware: ensures DB is connected before any route handler runs
+const dbMiddleware = async (req, res, next) => {
+    try {
+        await connect();
+        next();
+    } catch (err) {
+        console.error('[DB] Connection failed in middleware:', err.message);
+        res.status(503).json({ error: 'Database unavailable', code: '503' });
+    }
+};
+
+module.exports = { connect, dbMiddleware };
