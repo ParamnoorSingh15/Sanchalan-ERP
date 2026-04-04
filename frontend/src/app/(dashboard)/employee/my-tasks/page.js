@@ -33,7 +33,7 @@ export default function EmployeeTasksPage() {
                             </h2>
                             <div className="flex flex-col gap-3">
                                 {activeTasks.length === 0 ? (
-                                    <p className="text-slate-500 text-sm p-4 bg-slate-900 border border-slate-800 rounded-lg text-center">No active tasks. You're all caught up!</p>
+                                    <p className="text-slate-500 text-sm p-4 bg-slate-900 border border-slate-800 rounded-lg text-center">No active tasks. You&apos;re all caught up!</p>
                                 ) : (
                                     activeTasks.map(task => <TaskCard key={task._id} task={task} onStatusChange={updateStatus} />)
                                 )}
