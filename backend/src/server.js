@@ -3,16 +3,34 @@ const app = require('./app');
 const { connect } = require('./config/database');
 const config = require('./config/env');
 
-const start = async () => {
+let isConnected = false;
+const connectDB = async () => {
+    if (isConnected) return;
     try {
         await connect();
-        app.listen(config.port, () => {
-            console.log(`[Server] Listening on port ${config.port} (${config.nodeEnv})`);
-        });
+        isConnected = true;
+        console.log('[Server] Connected to MongoDB');
     } catch (err) {
-        console.error('[Server] Failed to start:', err.message);
-        process.exit(1);
+        console.error('[Server] DB Connection Failed:', err.message);
     }
 };
 
-start();
+if (!process.env.VERCEL) {
+    const start = async () => {
+        try {
+            await connectDB();
+            app.listen(config.port, () => {
+                console.log(`[Server] Listening on port ${config.port} (${config.nodeEnv})`);
+            });
+        } catch (err) {
+            console.error('[Server] Failed to start:', err.message);
+            process.exit(1);
+        }
+    };
+    start();
+} else {
+    // Vercel Serverless environment: Mongoose queues requests until connected
+    connectDB();
+}
+
+module.exports = app;
