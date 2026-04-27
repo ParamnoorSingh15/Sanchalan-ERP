@@ -98,7 +98,7 @@ function SearchPalette({ open, onClose }) {
 
                 <div className="max-h-72 overflow-y-auto py-1.5" data-lenis-prevent="true">
                     {results.length === 0 ? (
-                        <p className="px-5 py-8 text-center text-sm" style={{ color: 'var(--text-muted)' }}>No results for "{query}"</p>
+                        <p className="px-5 py-8 text-center text-sm" style={{ color: 'var(--text-muted)' }}>No results for &quot;{query}&quot;</p>
                     ) : results.map((item, i) => {
                         const Icon = item.icon;
                         return (
