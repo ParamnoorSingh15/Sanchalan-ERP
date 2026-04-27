@@ -106,15 +106,6 @@ Sanchalan-ERP/
 
 ---
 
-## 📸 Screenshots
-
-> _Add screenshots here_
-
-| Dashboard | Task Management | Security Anomalies |
-|---|---|---|
-| ![Dashboard]() | ![Tasks]() | ![Security]() |
-
----
 
 ## 🔮 Future Improvements
 
