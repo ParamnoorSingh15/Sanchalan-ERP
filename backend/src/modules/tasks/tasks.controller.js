@@ -50,7 +50,10 @@ exports.getTasks = async (req, res) => {
             // Can see all
         } else if (req.user.roles.includes('Manager')) {
             const manager = await User.findById(req.user.id);
-            query.departmentId = manager.departmentId;
+            query.$or = [
+                { departmentId: manager.departmentId },
+                { assignedTo: manager._id }   // tasks assigned directly to this manager (e.g. by admin)
+            ];
         } else {
             query.assignedTo = req.user.id;
         }

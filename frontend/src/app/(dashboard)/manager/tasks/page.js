@@ -7,7 +7,15 @@ import TaskCard from '@/components/features/tasks/TaskCard';
 import AssignTaskModal from '@/components/features/tasks/AssignTaskModal';
 
 export default function ManagerTasksPage() {
-    const { tasks, loading, fetchTasks } = useTasks();
+    const { tasks, loading, fetchTasks, updateStatus } = useTasks();
+
+    const handleStatusChange = async (taskId, action, payload = {}) => {
+        try {
+            await updateStatus(taskId, action, payload);
+        } catch (err) {
+            console.error('[Manager] status change failed:', err);
+        }
+    };
     const [isAssignModalOpen, setAssignModalOpen] = useState(false);
 
     useEffect(() => { fetchTasks(); }, [fetchTasks]);
@@ -42,7 +50,7 @@ export default function ManagerTasksPage() {
                 {items.length === 0 ? (
                     <p className="text-xs italic text-center py-6 rounded-lg" style={{ color: 'var(--text-muted)', border: '1px dashed var(--border)' }}>Empty list</p>
                 ) : (
-                    items.map(t => <TaskCard key={t._id} task={t} />)
+                    items.map(t => <TaskCard key={t._id} task={t} onStatusChange={handleStatusChange} />)
                 )}
             </div>
         </div>

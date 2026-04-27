@@ -5,6 +5,7 @@
 ![MongoDB](https://img.shields.io/badge/Database-MongoDB-brightgreen?style=flat-square&logo=mongodb)
 ![Vercel](https://img.shields.io/badge/Deployed-Vercel-black?style=flat-square&logo=vercel)
 ![License](https://img.shields.io/badge/License-ISC-blue?style=flat-square)
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-sanchalan--erp.vercel.app-blue?style=flat-square)](https://sanchalan-erp.vercel.app)
 
 > A full-stack Enterprise Resource Planning (ERP) system built for small-to-mid-sized organizations. Sanchalan ERP streamlines HR operations, task management, attendance tracking, and access control under a single, role-aware dashboard.
 
