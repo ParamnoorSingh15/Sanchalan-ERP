@@ -22,21 +22,21 @@ export default function EmployeeProfilePage() {
     return (
         <div className="space-y-6">
             <div className="flex flex-col mb-8">
-                <h1 className="text-3xl font-bold tracking-tight text-white mb-2">My Profile</h1>
-                <p className="text-slate-400">Your personal information and employment details.</p>
+                <h1 className="text-3xl font-bold tracking-tight mb-2" style={{ color: 'var(--text-primary)' }}>My Profile</h1>
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Your personal information and employment details.</p>
             </div>
-            <Card className="bg-slate-800 border-slate-700 shadow-xl">
-                <CardContent className="p-6">
+            <div className="rounded-xl border shadow-xl" style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border)' }}>
+                <div className="p-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {fields.map(f => (
                             <div key={f.label}>
-                                <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">{f.label}</p>
-                                <p className="text-slate-200 font-medium">{f.value}</p>
+                                <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>{f.label}</p>
+                                <p className="font-medium" style={{ color: 'var(--text-primary)' }}>{f.value}</p>
                             </div>
                         ))}
                     </div>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
         </div>
     );
 }

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import api from '@/lib/axios';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function EmployeeLeavesPage() {
     const [leaves, setLeaves] = useState([]);
@@ -31,76 +30,136 @@ export default function EmployeeLeavesPage() {
         } catch (err) { alert(err.response?.data?.error || 'Error'); }
     };
 
-    const statusColor = (s) => {
-        if (s === 'Approved') return 'bg-green-900/60 text-green-300 border-green-800';
-        if (s === 'Rejected') return 'bg-red-900/60 text-red-300 border-red-800';
-        if (s === 'Pending') return 'bg-yellow-900/60 text-yellow-300 border-yellow-800';
-        return 'bg-slate-700/60 text-slate-300 border-slate-600';
+    const statusBadge = (s) => {
+        if (s === 'Approved') return 'badge-success';
+        if (s === 'Rejected') return 'badge-danger';
+        if (s === 'Pending')  return 'badge-warning';
+        return 'badge-muted';
     };
 
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-white mb-2">My Leaves</h1>
-                    <p className="text-slate-400">Request and track your leave history.</p>
+                    <h1 className="text-3xl font-bold tracking-tight mb-2" style={{ color: 'var(--text-primary)' }}>My Leaves</h1>
+                    <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Request and track your leave history.</p>
                 </div>
-                <button onClick={() => setShowForm(!showForm)} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                <button
+                    onClick={() => setShowForm(!showForm)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                >
                     {showForm ? 'Cancel' : '+ Request Leave'}
                 </button>
             </div>
 
             {showForm && (
-                <Card className="bg-slate-800 border-slate-700 p-6">
+                <div className="rounded-xl border p-6 shadow-sm" style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border)' }}>
                     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                        <select value={form.leaveType} onChange={e => setForm({ ...form, leaveType: e.target.value })} className="bg-slate-900 border border-slate-700 rounded-md px-4 py-2 text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <select
+                            value={form.leaveType}
+                            onChange={e => setForm({ ...form, leaveType: e.target.value })}
+                            className="rounded-md px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                            style={{ backgroundColor: 'var(--bg-surface-3)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                        >
                             <option value="Casual">Casual</option>
                             <option value="Sick">Sick</option>
                             <option value="Annual">Annual</option>
                             <option value="Unpaid">Unpaid</option>
                         </select>
                         <div className="grid grid-cols-2 gap-4">
-                            <input type="date" value={form.startDate} onChange={e => setForm({ ...form, startDate: e.target.value })} required className="bg-slate-900 border border-slate-700 rounded-md px-4 py-2 text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                            <input type="date" value={form.endDate} onChange={e => setForm({ ...form, endDate: e.target.value })} required className="bg-slate-900 border border-slate-700 rounded-md px-4 py-2 text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            <input
+                                type="date"
+                                value={form.startDate}
+                                onChange={e => setForm({ ...form, startDate: e.target.value })}
+                                required
+                                className="rounded-md px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 [color-scheme:light_dark]"
+                                style={{ backgroundColor: 'var(--bg-surface-3)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                            />
+                            <input
+                                type="date"
+                                value={form.endDate}
+                                onChange={e => setForm({ ...form, endDate: e.target.value })}
+                                required
+                                className="rounded-md px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 [color-scheme:light_dark]"
+                                style={{ backgroundColor: 'var(--bg-surface-3)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                            />
                         </div>
-                        <input value={form.reason} onChange={e => setForm({ ...form, reason: e.target.value })} placeholder="Reason" required className="bg-slate-900 border border-slate-700 rounded-md px-4 py-2 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors w-fit">Submit Request</button>
+                        <input
+                            value={form.reason}
+                            onChange={e => setForm({ ...form, reason: e.target.value })}
+                            placeholder="Reason"
+                            required
+                            className="rounded-md px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                            style={{ backgroundColor: 'var(--bg-surface-3)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                        />
+                        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors w-fit">
+                            Submit Request
+                        </button>
                     </form>
-                </Card>
+                </div>
             )}
 
-            <Card className="bg-slate-800 border-slate-700 shadow-xl overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left text-slate-300">
-                        <thead className="text-xs text-slate-400 uppercase bg-slate-800/50 border-b border-slate-700">
+            <div
+                className="rounded-xl shadow-sm overflow-hidden border transition-colors duration-300"
+                style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border)' }}
+            >
+                <div className="overflow-x-auto" data-lenis-prevent="true">
+                    <table className="w-full text-sm text-left">
+                        <thead
+                            className="text-xs uppercase sticky top-0 z-10"
+                            style={{ backgroundColor: 'var(--bg-surface-3)', borderBottom: '1px solid var(--border)', color: 'var(--text-secondary)' }}
+                        >
                             <tr>
-                                <th className="px-6 py-4">Type</th>
-                                <th className="px-6 py-4">From</th>
-                                <th className="px-6 py-4">To</th>
-                                <th className="px-6 py-4">Reason</th>
-                                <th className="px-6 py-4">Status</th>
+                                <th className="px-6 py-3.5 font-semibold tracking-wide">Type</th>
+                                <th className="px-6 py-3.5 font-semibold tracking-wide">From</th>
+                                <th className="px-6 py-3.5 font-semibold tracking-wide">To</th>
+                                <th className="px-6 py-3.5 font-semibold tracking-wide">Reason</th>
+                                <th className="px-6 py-3.5 font-semibold tracking-wide">Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
-                                <tr><td colSpan="5" className="px-6 py-10 text-center text-slate-500"><div className="flex items-center justify-center gap-2"><div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-600 border-t-blue-500" />Loading...</div></td></tr>
+                                Array.from({ length: 5 }).map((_, i) => (
+                                    <tr key={i} className="border-b" style={{ borderColor: 'var(--border)' }}>
+                                        {Array.from({ length: 5 }).map((_, j) => (
+                                            <td key={j} className="px-6 py-4">
+                                                <div className="h-3.5 rounded animate-pulse" style={{ width: `${50 + j * 8}%`, backgroundColor: 'var(--bg-surface-3)' }} />
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))
                             ) : leaves.length === 0 ? (
-                                <tr><td colSpan="5" className="px-6 py-10 text-center text-slate-500">No leave requests found.</td></tr>
+                                <tr>
+                                    <td colSpan="5" className="px-6 py-12 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
+                                        No leave requests found.
+                                    </td>
+                                </tr>
                             ) : (
                                 leaves.map(l => (
-                                    <tr key={l._id} className="border-b border-slate-700 hover:bg-slate-700/50 transition-colors">
-                                        <td className="px-6 py-4 font-medium text-slate-200">{l.leaveType}</td>
-                                        <td className="px-6 py-4 text-slate-400">{new Date(l.startDate).toLocaleDateString()}</td>
-                                        <td className="px-6 py-4 text-slate-400">{new Date(l.endDate).toLocaleDateString()}</td>
-                                        <td className="px-6 py-4 text-slate-400">{l.reason}</td>
-                                        <td className="px-6 py-4"><span className={`px-2 py-0.5 text-xs font-semibold rounded-full border ${statusColor(l.status)}`}>{l.status}</span></td>
+                                    <tr
+                                        key={l._id}
+                                        className="border-b transition-colors duration-150"
+                                        style={{ borderColor: 'var(--border)' }}
+                                        onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--bg-hover)'; }}
+                                        onMouseLeave={e => { e.currentTarget.style.backgroundColor = ''; }}
+                                    >
+                                        <td className="px-6 py-3.5 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{l.leaveType}</td>
+                                        <td className="px-6 py-3.5 text-sm" style={{ color: 'var(--text-muted)' }}>{new Date(l.startDate).toLocaleDateString()}</td>
+                                        <td className="px-6 py-3.5 text-sm" style={{ color: 'var(--text-muted)' }}>{new Date(l.endDate).toLocaleDateString()}</td>
+                                        <td className="px-6 py-3.5 text-sm" style={{ color: 'var(--text-muted)' }}>{l.reason}</td>
+                                        <td className="px-6 py-3.5">
+                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-semibold rounded-full tracking-wide shadow-sm ${statusBadge(l.status)}`}>
+                                                <span className="w-1.5 h-1.5 rounded-full bg-current opacity-80 shrink-0" />
+                                                {l.status}
+                                            </span>
+                                        </td>
                                     </tr>
                                 ))
                             )}
                         </tbody>
                     </table>
                 </div>
-            </Card>
+            </div>
         </div>
     );
 }

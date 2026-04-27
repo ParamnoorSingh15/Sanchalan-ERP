@@ -31,6 +31,8 @@ app.use('/api/attendance', require('./modules/attendance/attendance.routes'));
 app.use('/api/leave', require('./modules/leave/leave.routes'));
 app.use('/api/performance', require('./modules/performance/performance.routes'));
 app.use('/api/tasks', require('./modules/tasks/tasks.routes'));
+app.use('/api/anomalies', require('./modules/anomaly/anomaly.routes'));
+app.use('/api/notifications', require('./modules/notifications/notifications.routes'));
 
 // ─── Health check ───────────────────────────────────────────────────────────
 app.get('/health', (_req, res) => {

@@ -25,9 +25,18 @@ export function useUsers({ page = 1, limit = 50 } = {}) {
         }
     }, [page, limit]);
 
+    const updateUser = async (id, userData) => {
+        try {
+            const { data } = await api.put(`/users/${id}`, userData);
+            return { success: true, data };
+        } catch (err) {
+            return { success: false, error: err.response?.data?.error || 'Failed to update user' };
+        }
+    };
+
     useEffect(() => {
         fetchUsers();
     }, [fetchUsers]);
 
-    return { users, meta, loading, error, refetch: fetchUsers };
+    return { users, meta, loading, error, refetch: fetchUsers, updateUser };
 }

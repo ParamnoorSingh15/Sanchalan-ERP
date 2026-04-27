@@ -2,14 +2,17 @@ const User = require('../../models/User');
 
 exports.getEmployees = async (req, res) => {
     try {
-        let query = { roles: 'Employee' };
+        let query = {};
         if (req.user.roles.includes('Manager')) {
             const manager = await User.findById(req.user.id);
             if (manager && manager.departmentId) {
                 query.departmentId = manager.departmentId;
+                query.roles = { $ne: 'Admin' }; // Exclude admins, include Managers and Employees
             } else {
                 return res.status(403).json({ error: 'Manager has no department assigned' });
             }
+        } else {
+            query.roles = 'Employee'; // Default fallback for Admin viewing employees
         }
         const employees = await User.find(query).select('-passwordHash').populate('departmentId', 'departmentName');
         res.status(200).json({ data: employees });

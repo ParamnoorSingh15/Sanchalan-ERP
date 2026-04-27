@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import api from '@/lib/axios';
 import RoleProtectedRoute from '@/components/auth/RoleProtectedRoute';
-import { Card } from '@/components/ui/card';
 
 export default function AdminEmployeesPage() {
     const [employees, setEmployees] = useState([]);
@@ -45,23 +44,52 @@ export default function AdminEmployeesPage() {
             <div className="space-y-6">
                 <div className="flex items-center justify-between mb-8">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight text-white mb-2">Employee Management</h1>
-                        <p className="text-slate-400">Create and manage employee accounts.</p>
+                        <h1 className="text-3xl font-bold tracking-tight mb-2" style={{ color: 'var(--text-primary)' }}>Employee Management</h1>
+                        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Create and manage employee accounts.</p>
                     </div>
-                    <button onClick={() => setShowForm(!showForm)} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                    <button
+                        onClick={() => setShowForm(!showForm)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                    >
                         {showForm ? 'Cancel' : '+ New Employee'}
                     </button>
                 </div>
 
                 {showForm && (
-                    <Card className="bg-slate-800 border-slate-700 p-6">
+                    <div className="rounded-xl border p-6 shadow-sm" style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border)' }}>
                         <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Full Name" required className="bg-slate-900 border border-slate-700 rounded-md px-4 py-2 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                            <input value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="Email" type="email" required className="bg-slate-900 border border-slate-700 rounded-md px-4 py-2 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                            <input value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} placeholder="Password" type="password" required className="bg-slate-900 border border-slate-700 rounded-md px-4 py-2 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                            <input value={form.employeeId} onChange={e => setForm({ ...form, employeeId: e.target.value })} placeholder="Employee ID (e.g. EMP-1001)" className="bg-slate-900 border border-slate-700 rounded-md px-4 py-2 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                            <input value={form.designation} onChange={e => setForm({ ...form, designation: e.target.value })} placeholder="Designation" className="bg-slate-900 border border-slate-700 rounded-md px-4 py-2 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                            <select value={form.departmentId} onChange={e => setForm({ ...form, departmentId: e.target.value })} className="bg-slate-900 border border-slate-700 rounded-md px-4 py-2 text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            {[
+                                { key: 'name', placeholder: 'Full Name', type: 'text', required: true },
+                                { key: 'email', placeholder: 'Email', type: 'email', required: true },
+                                { key: 'password', placeholder: 'Password', type: 'password', required: true },
+                                { key: 'employeeId', placeholder: 'Employee ID (e.g. EMP-1001)', type: 'text' },
+                                { key: 'designation', placeholder: 'Designation', type: 'text' },
+                            ].map(({ key, placeholder, type, required }) => (
+                                <input
+                                    key={key}
+                                    value={form[key]}
+                                    onChange={e => setForm({ ...form, [key]: e.target.value })}
+                                    placeholder={placeholder}
+                                    type={type}
+                                    required={required}
+                                    className="rounded-md px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                                    style={{
+                                        backgroundColor: 'var(--bg-surface-3)',
+                                        border: '1px solid var(--border)',
+                                        color: 'var(--text-primary)',
+                                    }}
+                                />
+                            ))}
+                            <select
+                                value={form.departmentId}
+                                onChange={e => setForm({ ...form, departmentId: e.target.value })}
+                                className="rounded-md px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                                style={{
+                                    backgroundColor: 'var(--bg-surface-3)',
+                                    border: '1px solid var(--border)',
+                                    color: 'var(--text-primary)',
+                                }}
+                            >
                                 <option value="">Select Department</option>
                                 {departments.map(d => <option key={d._id} value={d._id}>{d.departmentName}</option>)}
                             </select>
@@ -69,36 +97,64 @@ export default function AdminEmployeesPage() {
                                 <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">Create Employee</button>
                             </div>
                         </form>
-                    </Card>
+                    </div>
                 )}
 
-                <Card className="bg-slate-800 border-slate-700 shadow-xl overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-left text-slate-300">
-                            <thead className="text-xs text-slate-400 uppercase bg-slate-800/50 border-b border-slate-700">
+                <div
+                    className="rounded-xl shadow-sm overflow-hidden border transition-colors duration-300"
+                    style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border)' }}
+                >
+                    <div className="overflow-x-auto" data-lenis-prevent="true">
+                        <table className="w-full text-sm text-left">
+                            <thead
+                                className="text-xs uppercase sticky top-0 z-10"
+                                style={{
+                                    backgroundColor: 'var(--bg-surface-3)',
+                                    borderBottom: '1px solid var(--border)',
+                                    color: 'var(--text-secondary)',
+                                }}
+                            >
                                 <tr>
-                                    <th className="px-6 py-4">Name</th>
-                                    <th className="px-6 py-4">Email</th>
-                                    <th className="px-6 py-4">Employee ID</th>
-                                    <th className="px-6 py-4">Designation</th>
-                                    <th className="px-6 py-4">Status</th>
+                                    <th className="px-6 py-3.5 font-semibold tracking-wide">Name</th>
+                                    <th className="px-6 py-3.5 font-semibold tracking-wide">Email</th>
+                                    <th className="px-6 py-3.5 font-semibold tracking-wide">Employee ID</th>
+                                    <th className="px-6 py-3.5 font-semibold tracking-wide">Designation</th>
+                                    <th className="px-6 py-3.5 font-semibold tracking-wide">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {loading ? (
-                                    <tr><td colSpan="5" className="px-6 py-10 text-center text-slate-500"><div className="flex items-center justify-center gap-2"><div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-600 border-t-blue-500" />Loading...</div></td></tr>
+                                    Array.from({ length: 5 }).map((_, i) => (
+                                        <tr key={i} className="border-b" style={{ borderColor: 'var(--border)' }}>
+                                            {Array.from({ length: 5 }).map((_, j) => (
+                                                <td key={j} className="px-6 py-4">
+                                                    <div className="h-3.5 rounded animate-pulse" style={{ width: `${50 + j * 8}%`, backgroundColor: 'var(--bg-surface-3)' }} />
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ))
                                 ) : employees.length === 0 ? (
-                                    <tr><td colSpan="5" className="px-6 py-10 text-center text-slate-500">No employees found.</td></tr>
+                                    <tr>
+                                        <td colSpan="5" className="px-6 py-12 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
+                                            No employees found.
+                                        </td>
+                                    </tr>
                                 ) : (
                                     employees.map(emp => (
-                                        <tr key={emp._id} className="border-b border-slate-700 hover:bg-slate-700/50 transition-colors">
-                                            <td className="px-6 py-4 font-medium text-slate-200">{emp.name}</td>
-                                            <td className="px-6 py-4 text-slate-400">{emp.email}</td>
-                                            <td className="px-6 py-4 text-slate-400">{emp.employeeId || '—'}</td>
-                                            <td className="px-6 py-4 text-slate-400">{emp.designation || '—'}</td>
-                                            <td className="px-6 py-4">
-                                                <span className={`inline-flex items-center gap-1.5 text-xs font-semibold ${emp.isActive ? 'text-green-400' : 'text-red-400'}`}>
-                                                    <span className={`w-1.5 h-1.5 rounded-full ${emp.isActive ? 'bg-green-500' : 'bg-red-500'}`} />
+                                        <tr
+                                            key={emp._id}
+                                            className="border-b transition-colors duration-150"
+                                            style={{ borderColor: 'var(--border)' }}
+                                            onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--bg-hover)'; }}
+                                            onMouseLeave={e => { e.currentTarget.style.backgroundColor = ''; }}
+                                        >
+                                            <td className="px-6 py-3.5 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{emp.name}</td>
+                                            <td className="px-6 py-3.5 text-sm" style={{ color: 'var(--text-muted)' }}>{emp.email}</td>
+                                            <td className="px-6 py-3.5 text-sm" style={{ color: 'var(--text-muted)' }}>{emp.employeeId || '—'}</td>
+                                            <td className="px-6 py-3.5 text-sm" style={{ color: 'var(--text-muted)' }}>{emp.designation || '—'}</td>
+                                            <td className="px-6 py-3.5">
+                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-semibold rounded-full tracking-wide shadow-sm ${emp.isActive ? 'badge-success' : 'badge-muted'}`}>
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-current opacity-80 shrink-0" />
                                                     {emp.status || (emp.isActive ? 'Active' : 'Inactive')}
                                                 </span>
                                             </td>
@@ -108,7 +164,7 @@ export default function AdminEmployeesPage() {
                             </tbody>
                         </table>
                     </div>
-                </Card>
+                </div>
             </div>
         </RoleProtectedRoute>
     );

@@ -8,16 +8,19 @@ import api from '@/lib/axios';
 
 function StatCard({ title, value, subtitle, icon: Icon, iconColor = 'text-blue-400' }) {
     return (
-        <Card className="bg-slate-800 border-slate-700 text-slate-100 shadow-xl transition-all hover:-translate-y-1">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <div
+            className="rounded-xl border shadow-xl transition-all hover:-translate-y-1"
+            style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+        >
+            <div className="flex flex-row items-center justify-between space-y-0 p-6 pb-2">
+                <h3 className="text-sm font-medium tracking-tight">{title}</h3>
                 <Icon className={`h-4 w-4 ${iconColor}`} />
-            </CardHeader>
-            <CardContent>
+            </div>
+            <div className="p-6 pt-0">
                 <div className="text-2xl font-bold">{value}</div>
-                {subtitle && <p className="text-xs text-slate-400 mt-1">{subtitle}</p>}
-            </CardContent>
-        </Card>
+                {subtitle && <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>{subtitle}</p>}
+            </div>
+        </div>
     );
 }
 
@@ -100,10 +103,10 @@ export default function DashboardPage() {
     return (
         <div className="space-y-6">
             <div className="flex flex-col mb-8">
-                <h1 className="text-3xl font-bold tracking-tight text-white">
+                <h1 className="text-3xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
                     Welcome back, {user?.name || 'User'}
                 </h1>
-                <p className="text-slate-400 mt-2">
+                <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>
                     {isAdmin && "Here's an overview of the system status."}
                     {isManager && "Here's a summary of your department's activity."}
                     {isEmployee && "Here is your personal workspace."}

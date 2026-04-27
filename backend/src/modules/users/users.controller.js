@@ -80,7 +80,7 @@ exports.getUserById = async (req, res) => {
  */
 exports.updateUser = async (req, res) => {
     try {
-        const { roles, department, isActive } = req.body;
+        const { roles, department, isActive, status } = req.body;
 
         const userToUpdate = await User.findById(req.params.id);
         if (!userToUpdate) {
@@ -98,6 +98,7 @@ exports.updateUser = async (req, res) => {
         }
         if (department !== undefined) updates.department = department;
         if (isActive !== undefined) updates.isActive = isActive;
+        if (status !== undefined) updates.status = status;
 
         const updatedUser = await User.findByIdAndUpdate(req.params.id, updates, { new: true }).select('-passwordHash -mfaSecret');
 

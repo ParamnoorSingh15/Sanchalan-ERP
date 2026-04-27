@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import api from '@/lib/axios';
 import RoleProtectedRoute from '@/components/auth/RoleProtectedRoute';
-import { Card } from '@/components/ui/card';
 
 export default function AdminPerformancePage() {
     const [reviews, setReviews] = useState([]);
@@ -20,47 +19,86 @@ export default function AdminPerformancePage() {
         fetch();
     }, []);
 
+    const ratingColor = (r) => {
+        if (r >= 4) return 'badge-success';
+        if (r >= 3) return 'badge-warning';
+        return 'badge-danger';
+    };
+
     return (
         <RoleProtectedRoute requiredRoles={['Admin']}>
             <div className="space-y-6">
                 <div className="flex flex-col mb-8">
-                    <h1 className="text-3xl font-bold tracking-tight text-white mb-2">Performance Reviews</h1>
-                    <p className="text-slate-400">Organization-wide performance ratings and reviews.</p>
+                    <h1 className="text-3xl font-bold tracking-tight mb-2" style={{ color: 'var(--text-primary)' }}>Performance Reviews</h1>
+                    <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Organization-wide performance ratings and reviews.</p>
                 </div>
-                <Card className="bg-slate-800 border-slate-700 shadow-xl overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-left text-slate-300">
-                            <thead className="text-xs text-slate-400 uppercase bg-slate-800/50 border-b border-slate-700">
+
+                <div
+                    className="rounded-xl shadow-sm overflow-hidden border transition-colors duration-300"
+                    style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border)' }}
+                >
+                    <div className="overflow-x-auto" data-lenis-prevent="true">
+                        <table className="w-full text-sm text-left">
+                            <thead
+                                className="text-xs uppercase sticky top-0 z-10"
+                                style={{
+                                    backgroundColor: 'var(--bg-surface-3)',
+                                    borderBottom: '1px solid var(--border)',
+                                    color: 'var(--text-secondary)',
+                                }}
+                            >
                                 <tr>
-                                    <th className="px-6 py-4">Employee</th>
-                                    <th className="px-6 py-4">Reviewer</th>
-                                    <th className="px-6 py-4">Period</th>
-                                    <th className="px-6 py-4">Rating</th>
-                                    <th className="px-6 py-4">Productivity</th>
-                                    <th className="px-6 py-4">Tasks Done</th>
+                                    <th className="px-6 py-3.5 font-semibold tracking-wide">Employee</th>
+                                    <th className="px-6 py-3.5 font-semibold tracking-wide">Reviewer</th>
+                                    <th className="px-6 py-3.5 font-semibold tracking-wide">Period</th>
+                                    <th className="px-6 py-3.5 font-semibold tracking-wide">Rating</th>
+                                    <th className="px-6 py-3.5 font-semibold tracking-wide">Productivity</th>
+                                    <th className="px-6 py-3.5 font-semibold tracking-wide">Tasks Done</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {loading ? (
-                                    <tr><td colSpan="6" className="px-6 py-10 text-center text-slate-500"><div className="flex items-center justify-center gap-2"><div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-600 border-t-blue-500" />Loading...</div></td></tr>
+                                    Array.from({ length: 5 }).map((_, i) => (
+                                        <tr key={i} className="border-b" style={{ borderColor: 'var(--border)' }}>
+                                            {Array.from({ length: 6 }).map((_, j) => (
+                                                <td key={j} className="px-6 py-4">
+                                                    <div className="h-3.5 rounded animate-pulse" style={{ width: `${50 + j * 7}%`, backgroundColor: 'var(--bg-surface-3)' }} />
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ))
                                 ) : reviews.length === 0 ? (
-                                    <tr><td colSpan="6" className="px-6 py-10 text-center text-slate-500">No performance reviews found.</td></tr>
+                                    <tr>
+                                        <td colSpan="6" className="px-6 py-12 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
+                                            No performance reviews found.
+                                        </td>
+                                    </tr>
                                 ) : (
                                     reviews.map(r => (
-                                        <tr key={r._id} className="border-b border-slate-700 hover:bg-slate-700/50 transition-colors">
-                                            <td className="px-6 py-4 font-medium text-slate-200">{r.employeeId?.name || '—'}</td>
-                                            <td className="px-6 py-4 text-slate-400">{r.reviewerId?.name || '—'}</td>
-                                            <td className="px-6 py-4 text-slate-400">{r.reviewPeriod}</td>
-                                            <td className="px-6 py-4"><span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-900/60 text-amber-300 border border-amber-800">{r.rating}/5</span></td>
-                                            <td className="px-6 py-4 text-slate-400">{r.productivityScore || '—'}</td>
-                                            <td className="px-6 py-4 text-slate-400">{r.tasksCompleted || '—'}</td>
+                                        <tr
+                                            key={r._id}
+                                            className="border-b transition-colors duration-150"
+                                            style={{ borderColor: 'var(--border)' }}
+                                            onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--bg-hover)'; }}
+                                            onMouseLeave={e => { e.currentTarget.style.backgroundColor = ''; }}
+                                        >
+                                            <td className="px-6 py-3.5 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{r.employeeId?.name || '—'}</td>
+                                            <td className="px-6 py-3.5 text-sm" style={{ color: 'var(--text-muted)' }}>{r.reviewerId?.name || '—'}</td>
+                                            <td className="px-6 py-3.5 text-sm" style={{ color: 'var(--text-muted)' }}>{r.reviewPeriod}</td>
+                                            <td className="px-6 py-3.5">
+                                                <span className={`inline-flex items-center px-2.5 py-0.5 text-[11px] font-semibold rounded-full ${ratingColor(r.rating)}`}>
+                                                    {r.rating}/5
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-3.5 text-sm" style={{ color: 'var(--text-muted)' }}>{r.productivityScore || '—'}</td>
+                                            <td className="px-6 py-3.5 text-sm" style={{ color: 'var(--text-muted)' }}>{r.tasksCompleted || '—'}</td>
                                         </tr>
                                     ))
                                 )}
                             </tbody>
                         </table>
                     </div>
-                </Card>
+                </div>
             </div>
         </RoleProtectedRoute>
     );

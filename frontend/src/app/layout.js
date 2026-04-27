@@ -2,7 +2,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
 import QueryProvider from '@/providers/QueryProvider';
-import SmoothScroll from '@/components/layout/SmoothScroll';
+import SmoothScrollProvider from '@/lib/smoothScroll';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -21,11 +21,11 @@ export default function RootLayout({ children }) {
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <QueryProvider>
             <AuthProvider>
-              <SmoothScroll>
+              <SmoothScrollProvider>
                 <TooltipProvider>
                   {children}
                 </TooltipProvider>
-              </SmoothScroll>
+              </SmoothScrollProvider>
             </AuthProvider>
           </QueryProvider>
         </ThemeProvider>

@@ -1,77 +1,183 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback, memo } from 'react';
 import RoleProtectedRoute from '@/components/auth/RoleProtectedRoute';
 import { useTasks } from '@/hooks/useTasks';
-import { Card } from '@/components/ui/card';
 import TaskStatusBadge from '@/components/features/tasks/TaskStatusBadge';
+import AdminAssignTaskModal from '@/components/features/tasks/AdminAssignTaskModal';
+
+/* ── Overdue indicator ─────────────────────────────── */
+function DueDateCell({ dueDate, status }) {
+    const isOverdue = new Date(dueDate) < new Date() && status !== 'Completed' && status !== 'Cancelled';
+    return (
+        <span className={isOverdue ? 'font-semibold' : ''}
+              style={{ color: isOverdue ? 'var(--color-danger-fg)' : 'var(--text-muted)' }}>
+            {new Date(dueDate).toLocaleDateString()}
+            {isOverdue && <span className="ml-1.5 text-[10px] badge-danger px-1.5 py-0.5 rounded-full">Overdue</span>}
+        </span>
+    );
+}
+
+/* Memoised table row ──────────────────────────────── */
+const TaskRow = memo(function TaskRow({ task, onDelete }) {
+    return (
+        <tr
+            className="border-b transition-colors duration-150 group"
+            style={{ borderColor: 'var(--border)' }}
+            onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--bg-hover)'; }}
+            onMouseLeave={e => { e.currentTarget.style.backgroundColor = ''; }}
+        >
+            <td className="px-6 py-3.5">
+                <div className="font-semibold text-sm leading-tight line-clamp-1" style={{ color: 'var(--text-primary)' }}>{task.taskTitle}</div>
+                <div className="text-[11px] mt-0.5 font-mono" style={{ color: 'var(--text-muted)' }}>
+                    {task._id.slice(-8)}
+                </div>
+            </td>
+            <td className="px-6 py-3.5 text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                {task.departmentId?.departmentName || 'Global'}
+            </td>
+            <td className="px-6 py-3.5">
+                {task.assignedTo ? (
+                    <div>
+                        <div className="text-sm" style={{ color: 'var(--text-primary)' }}>{task.assignedTo.name}</div>
+                        <div className="text-[11px]" style={{ color: 'var(--text-muted)' }}>
+                            {task.assignedTo.designation || task.assignedTo.email}
+                        </div>
+                    </div>
+                ) : (
+                    <span className="badge-muted text-[11px] px-2 py-0.5 rounded-full font-medium">Unassigned</span>
+                )}
+            </td>
+            <td className="px-6 py-3.5">
+                <TaskStatusBadge status={task.status} priority={task.priority} />
+            </td>
+            <td className="px-6 py-3.5">
+                <DueDateCell dueDate={task.dueDate} status={task.status} />
+            </td>
+            <td className="px-6 py-3.5 text-right">
+                <button
+                    onClick={() => onDelete(task._id)}
+                    className="opacity-0 group-hover:opacity-100 focus:opacity-100 text-[11px] px-3 py-1.5 badge-danger rounded-lg transition-all duration-150 font-semibold"
+                >
+                    Delete
+                </button>
+            </td>
+        </tr>
+    );
+});
 
 export default function AdminTasksPage() {
     const { tasks, loading, fetchTasks, deleteTask } = useTasks();
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => { fetchTasks(); }, [fetchTasks]);
+
+    const handleDelete = useCallback((id) => {
+        if (confirm('Delete this task? This action permanently removes it from analytics.')) {
+            deleteTask(id);
+        }
+    }, [deleteTask]);
+
+    const handleTaskCreated = useCallback(() => {
+        fetchTasks();
+    }, [fetchTasks]);
+
+    // Summary stats
+    const stats = {
+        total:     tasks.length,
+        active:    tasks.filter(t => ['Assigned', 'In Progress'].includes(t.status)).length,
+        overdue:   tasks.filter(t => new Date(t.dueDate) < new Date() && !['Completed', 'Cancelled'].includes(t.status)).length,
+        completed: tasks.filter(t => t.status === 'Completed').length,
+    };
 
     return (
         <RoleProtectedRoute requiredRoles={['Admin']}>
             <div className="space-y-6">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-white mb-2">Global Task Registry</h1>
-                    <p className="text-slate-400">Enterprise-wide oversight of all active and blocked operational workloads.</p>
+                {/* Header */}
+                <div className="flex items-start justify-between">
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-tight mb-2" style={{ color: 'var(--text-primary)' }}>Global Task Registry</h1>
+                        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                            Organization-wide oversight of all tasks. Assign, delete, and monitor workloads.
+                        </p>
+                    </div>
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl shadow-md shadow-blue-900/30 transition-all duration-200 interactive shrink-0"
+                    >
+                        + Assign Task
+                    </button>
                 </div>
 
-                <Card className="bg-slate-800 border-slate-700 shadow-xl overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-left text-slate-300">
-                            <thead className="text-xs text-slate-400 uppercase bg-slate-800/50 border-b border-slate-700">
+                {/* Stats Row */}
+                {!loading && tasks.length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {[
+                            { label: 'Total Tasks',  value: stats.total,     cls: 'badge-muted'    },
+                            { label: 'Active',        value: stats.active,    cls: 'badge-info'     },
+                            { label: 'Overdue',       value: stats.overdue,   cls: 'badge-danger'   },
+                            { label: 'Completed',     value: stats.completed, cls: 'badge-success'  },
+                        ].map(({ label, value, cls }) => (
+                            <div key={label} className={`${cls} flex items-center justify-between px-4 py-3 rounded-xl shadow-sm`}>
+                                <span className="text-xs font-semibold uppercase tracking-wide opacity-80">{label}</span>
+                                <span className="text-xl font-bold">{value}</span>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Table */}
+                <div
+                    className="rounded-xl shadow-sm overflow-hidden card-hover border transition-colors duration-300"
+                    style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border)' }}
+                >
+                    <div className="overflow-x-auto" data-lenis-prevent="true">
+                        <table className="w-full text-sm text-left">
+                            <thead className="text-xs uppercase sticky top-0 z-10"
+                                   style={{ backgroundColor: 'var(--bg-surface-3)', borderBottom: '1px solid var(--border)', color: 'var(--text-secondary)' }}>
                                 <tr>
-                                    <th className="px-6 py-4">Task Info</th>
-                                    <th className="px-6 py-4">Department</th>
-                                    <th className="px-6 py-4">Assigned To</th>
-                                    <th className="px-6 py-4">Status & Priority</th>
-                                    <th className="px-6 py-4">Due Date</th>
-                                    <th className="px-6 py-4 text-right">Actions</th>
+                                    <th className="px-6 py-3.5 font-semibold tracking-wide">Task</th>
+                                    <th className="px-6 py-3.5 font-semibold tracking-wide">Department</th>
+                                    <th className="px-6 py-3.5 font-semibold tracking-wide">Assigned To</th>
+                                    <th className="px-6 py-3.5 font-semibold tracking-wide">Status / Priority</th>
+                                    <th className="px-6 py-3.5 font-semibold tracking-wide">Due</th>
+                                    <th className="px-6 py-3.5 text-right font-semibold tracking-wide">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {loading ? (
-                                    <tr><td colSpan="6" className="px-6 py-10 text-center"><div className="flex justify-center gap-2"><div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-600 border-t-blue-500" />Loading Database...</div></td></tr>
+                                    Array.from({ length: 7 }).map((_, i) => (
+                                        <tr key={i} className="border-b" style={{ borderColor: 'var(--border)' }}>
+                                            {Array.from({ length: 6 }).map((_, j) => (
+                                                <td key={j} className="px-6 py-4">
+                                                    <div className="h-3.5 rounded animate-pulse"
+                                                         style={{ width: `${50 + j * 7}%`, backgroundColor: 'var(--bg-surface-3)' }} />
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ))
                                 ) : tasks.length === 0 ? (
-                                    <tr><td colSpan="6" className="px-6 py-10 text-center text-slate-500">No tasks exist in the system yet.</td></tr>
+                                    <tr>
+                                        <td colSpan="6" className="px-6 py-14 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
+                                            No tasks found. Click <strong>+ Assign Task</strong> to create the first one.
+                                        </td>
+                                    </tr>
                                 ) : (
                                     tasks.map(task => (
-                                        <tr key={task._id} className="border-b border-slate-700 hover:bg-slate-700/50 transition-colors">
-                                            <td className="px-6 py-4">
-                                                <div className="font-semibold text-slate-200 line-clamp-1">{task.taskTitle}</div>
-                                                <div className="text-xs text-slate-500 mt-1">ID: {task._id}</div>
-                                            </td>
-                                            <td className="px-6 py-4 font-medium">{task.departmentId?.departmentName || 'Global'}</td>
-                                            <td className="px-6 py-4">
-                                                <div className="text-slate-300">{task.assignedTo?.name || 'Unassigned'}</div>
-                                                <div className="text-xs text-slate-500">{task.assignedTo?.designation || ''}</div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <TaskStatusBadge status={task.status} priority={task.priority} />
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className={new Date(task.dueDate) < new Date() && task.status !== 'Completed' ? 'text-red-400 font-semibold' : 'text-slate-400'}>
-                                                    {new Date(task.dueDate).toLocaleDateString()}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-right">
-                                                <button onClick={() => {
-                                                    if (confirm('Are you sure? This soft-deletes the task affecting analytics.')) deleteTask(task._id);
-                                                }} className="text-xs px-3 py-1 bg-red-900/30 text-red-400 hover:bg-red-800/80 rounded transition-colors font-medium border border-red-800/50">
-                                                    Delete
-                                                </button>
-                                            </td>
-                                        </tr>
+                                        <TaskRow key={task._id} task={task} onDelete={handleDelete} />
                                     ))
                                 )}
                             </tbody>
                         </table>
                     </div>
-                </Card>
+                </div>
             </div>
+
+            <AdminAssignTaskModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onTaskCreated={handleTaskCreated}
+            />
         </RoleProtectedRoute>
     );
 }
