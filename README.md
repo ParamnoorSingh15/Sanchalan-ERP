@@ -1,72 +1,135 @@
 # Sanchalan ERP
 
-Sanchalan ERP is a modern, modularized Enterprise Resource Planning software solution designed to streamline business operations. Built with a robust full-stack architecture, it incorporates a comprehensive task management module, user administration, secure role-based access control (RBAC), audit logging, and modern frontend aesthetics.
+![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js)
+![Node.js](https://img.shields.io/badge/Node.js-Express-green?style=flat-square&logo=node.js)
+![MongoDB](https://img.shields.io/badge/Database-MongoDB-brightgreen?style=flat-square&logo=mongodb)
+![Vercel](https://img.shields.io/badge/Deployed-Vercel-black?style=flat-square&logo=vercel)
+![License](https://img.shields.io/badge/License-ISC-blue?style=flat-square)
 
-## 🚀 Tech Stack
+> A full-stack Enterprise Resource Planning (ERP) system built for small-to-mid-sized organizations. Sanchalan ERP streamlines HR operations, task management, attendance tracking, and access control under a single, role-aware dashboard.
 
-### Frontend
-- **Framework**: Next.js 14
-- **UI & Styling**: Tailwind CSS, PostCSS
-- **Components & Animation**: Shadcn/UI, Base UI, Framer Motion, Lucide React
-- **State Management & Fetching**: React Query, Axios
+---
 
-### Backend
-- **Environment**: Node.js
-- **Framework**: Express.js
-- **Database**: MongoDB (Mongoose)
-- **Security**: JWT Authentication, Bcrypt (Password Hashing), Helmet, Express Rate Limit
-- **File Uploads**: Multer
-- **Email Service**: Nodemailer
+## ✨ Features
 
-## 📂 Project Structure
+- 🔐 **JWT Authentication** — Secure login, refresh tokens, password reset via email
+- 🛡️ **Role-Based Access Control** — Admin, Manager, and Employee roles with protected routes
+- 👥 **User & Employee Management** — Full CRUD with department and manager assignment
+- 📋 **Task Management** — Assign, track, and manage tasks with cascading Dept → Role → User flow
+- 📅 **Leave Management** — Apply, approve/reject leaves with status tracking
+- 🕐 **Attendance Tracking** — Per-employee attendance records with admin oversight
+- 📊 **Analytics Dashboard** — Charts and KPIs for performance and activity overview
+- 🔔 **Real-Time Notifications** — Persistent, data-driven notifications with mark-all-read
+- 🚨 **Security Anomaly Detection** — High-risk user flagging and audit trail visualization
+- 📝 **Audit Logs** — Full action history for compliance
+- 🌙 **Dark / Light / System Theme** — Smooth theme switching with `next-themes`
 
-- `/frontend`: Next.js web application.
-- `/backend`: Node.js/Express API.
-- `docker-compose.yml`: Container orchestration for development environments.
+---
 
-## 🛠️ Getting Started
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Frontend** | Next.js 14, React, Tailwind CSS, Framer Motion, GSAP, Recharts |
+| **UI Components** | shadcn/ui, Lucide Icons, Radix UI |
+| **State / Data** | TanStack React Query, Axios |
+| **Backend** | Node.js, Express.js |
+| **Database** | MongoDB (Mongoose ODM) |
+| **Auth** | JWT (Access + Refresh tokens), bcrypt, HttpOnly cookies |
+| **Deployment** | Vercel (Frontend + Backend as serverless), MongoDB Atlas |
+
+---
+
+## 🔑 Demo Login
+
+> **Live credentials to explore the app**
+
+| Field | Value |
+|---|---|
+| Email | `admin@company.com` |
+| Password | `admin123` |
+| Role | Admin (full access) |
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js (v18+)
-- MongoDB
-- Docker (optional, for containerized development)
+- Node.js ≥ 18
+- MongoDB running locally or MongoDB Atlas URI
 
-### Running Locally
-
-**1. Clone the repository**
+### 1. Clone the repository
 ```bash
 git clone https://github.com/ParamnoorSingh15/Sanchalan-ERP.git
 cd Sanchalan-ERP
 ```
 
-**2. Setup the Backend**
+### 2. Setup Backend
 ```bash
 cd backend
+cp .env.example .env        # Fill in MONGO_URL and JWT_SECRET
 npm install
-# Set up your .env file with necessary variables (PORT, MONGO_URI, JWT_SECRET, etc.)
-npm run dev
+npm run seed                # Seeds the admin user
+npm run dev                 # Starts on http://localhost:8000
 ```
 
-**3. Setup the Frontend**
+### 3. Setup Frontend
 ```bash
 cd frontend
+cp .env.example .env.local  # Set NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api
 npm install
-npm run dev
+npm run dev                 # Starts on http://localhost:3000
 ```
-
-### Running with Docker
-
-You can spin up the entire stack using Docker Compose:
-```bash
-docker-compose up --build
-```
-
-## 📝 Features Overview (Phase 1)
-- **Secure Authentication:** JWT-based login with automated account lockout policies.
-- **Role-Based Access Control:** Fine-grained permissions and user management.
-- **Task Management:** Complete CRUD workflows, status transitions, priority handling, file attachments, and assignment systems.
-- **Audit Logging:** System-wide activity tracking for administrative oversight.
 
 ---
 
-*Designed and engineered with performance, security, and exceptional user experience in mind.*
+## 📁 Folder Structure
+
+```
+Sanchalan-ERP/
+├── backend/
+│   ├── src/
+│   │   ├── modules/        # Auth, Users, Tasks, Leaves, Notifications…
+│   │   ├── models/         # Mongoose schemas
+│   │   ├── middleware/      # Auth, RBAC, rate limiting
+│   │   └── config/         # Env, DB connection
+│   └── seed.js             # Admin seeder
+│
+└── frontend/
+    └── src/
+        ├── app/            # Next.js App Router pages (auth, dashboard)
+        ├── components/     # Layout, UI primitives, feature components
+        ├── contexts/       # AuthContext
+        ├── hooks/          # Custom React Query hooks
+        └── lib/            # Axios instance, utilities
+```
+
+---
+
+## 📸 Screenshots
+
+> _Add screenshots here_
+
+| Dashboard | Task Management | Security Anomalies |
+|---|---|---|
+| ![Dashboard]() | ![Tasks]() | ![Security]() |
+
+---
+
+## 🔮 Future Improvements
+
+- [ ] Email delivery via SMTP (currently mocked)
+- [ ] ML-driven performance scoring
+- [ ] Mobile-responsive native app
+- [ ] Payroll module
+
+---
+
+## 👤 Author
+
+**Paramnoor Singh**
+- GitHub: [@ParamnoorSingh15](https://github.com/ParamnoorSingh15)
+
+---
+
+> Built with ❤️ as a portfolio project demonstrating full-stack engineering with real-world ERP workflows.
